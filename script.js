@@ -102,6 +102,7 @@ var anch = function anch() {
 
     if (target.classList.contains('header-menu-list-link')) {
       event.preventDefault();
+      headerMenu.classList.toggle('header-menu-active');
       var id = target.getAttribute('href');
       var elem = document.querySelector(id);
       window.scroll({
@@ -150,8 +151,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var core_js_modules_es_array_for_each_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_array_for_each_js__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var core_js_modules_es_number_to_fixed_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! core-js/modules/es.number.to-fixed.js */ "./node_modules/core-js/modules/es.number.to-fixed.js");
 /* harmony import */ var core_js_modules_es_number_to_fixed_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_number_to_fixed_js__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var core_js_modules_web_dom_collections_for_each_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! core-js/modules/web.dom-collections.for-each.js */ "./node_modules/core-js/modules/web.dom-collections.for-each.js");
-/* harmony import */ var core_js_modules_web_dom_collections_for_each_js__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_web_dom_collections_for_each_js__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var core_js_modules_es_object_keys_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! core-js/modules/es.object.keys.js */ "./node_modules/core-js/modules/es.object.keys.js");
+/* harmony import */ var core_js_modules_es_object_keys_js__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_object_keys_js__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var core_js_modules_web_dom_collections_for_each_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! core-js/modules/web.dom-collections.for-each.js */ "./node_modules/core-js/modules/web.dom-collections.for-each.js");
+/* harmony import */ var core_js_modules_web_dom_collections_for_each_js__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_web_dom_collections_for_each_js__WEBPACK_IMPORTED_MODULE_3__);
+
 
 
 
@@ -162,53 +166,32 @@ var cart = function cart() {
   var elements = document.querySelectorAll('.category-slider-item'),
       cart = {};
 
-  var getHtmlItem = function getHtmlItem() {
-    elements.forEach(function (item) {
-      cart[item.querySelector('.categoty-slider-title').textContent] = {
-        price: item.querySelector('.price-count').textContent,
-        status: false
-      };
-    });
-    localStorage.setItem('key', JSON.stringify(cart));
-  };
-
   var calc = function calc() {
     var sum = 0;
-
-    for (var item in cart) {
-      if (cart[item].status) {
-        sum += +cart[item].price;
-      }
-    }
-
+    var keys = Object.keys(cart);
+    keys.forEach(function (key) {
+      sum += +cart[key];
+    });
     cartCount.textContent = sum.toFixed(2);
   };
 
   var render = function render() {
     elements = document.querySelectorAll('.category-slider-item');
-
-    var _loop = function _loop(item) {
-      elements.forEach(function (elem) {
-        if (elem.querySelector('.categoty-slider-title').textContent === item && cart[item].status) {
-          elem.classList.add('category-slider-item-active');
-        } else if (elem.querySelector('.categoty-slider-title').textContent === item && !cart[item].status) {
-          elem.classList.remove('category-slider-item-active');
-        }
-      });
-    };
-
-    for (var item in cart) {
-      _loop(item);
-    }
-
+    elements.forEach(function (elem) {
+      if (cart.hasOwnProperty(elem.getAttribute('data-id'))) {
+        elem.classList.add('category-slider-item-active');
+      } else {
+        elem.classList.remove('category-slider-item-active');
+      }
+    });
     calc();
   };
 
   var getItemsList = function getItemsList() {
-    if (localStorage.getItem('key')) {
-      cart = JSON.parse(localStorage.getItem('key'));
+    if (localStorage.getItem('delivery')) {
+      cart = JSON.parse(localStorage.getItem('delivery'));
       render();
-    } else getHtmlItem();
+    }
   };
 
   getItemsList();
@@ -217,8 +200,16 @@ var cart = function cart() {
 
     if (target && target.classList.contains('category-slider-btn')) {
       e.preventDefault();
-      cart[target.closest('.category-slider-item').querySelector('.categoty-slider-title').textContent].status = !cart[target.closest('.category-slider-item').querySelector('.categoty-slider-title').textContent].status;
-      localStorage.setItem('key', JSON.stringify(cart));
+      var targetId = target.closest('.category-slider-item').getAttribute('data-id');
+      var price = target.closest('.category-slider-item').querySelector('.price-count').textContent;
+
+      if (cart.hasOwnProperty(targetId)) {
+        delete cart[targetId];
+      } else {
+        cart[targetId] = price;
+      }
+
+      localStorage.setItem('delivery', JSON.stringify(cart));
       render();
     }
   });
@@ -2216,6 +2207,25 @@ module.exports = function (object, names) {
 
 /***/ }),
 
+/***/ "./node_modules/core-js/internals/object-keys.js":
+/*!*******************************************************!*\
+  !*** ./node_modules/core-js/internals/object-keys.js ***!
+  \*******************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var internalObjectKeys = __webpack_require__(/*! ../internals/object-keys-internal */ "./node_modules/core-js/internals/object-keys-internal.js");
+var enumBugKeys = __webpack_require__(/*! ../internals/enum-bug-keys */ "./node_modules/core-js/internals/enum-bug-keys.js");
+
+// `Object.keys` method
+// https://tc39.github.io/ecma262/#sec-object.keys
+module.exports = Object.keys || function keys(O) {
+  return internalObjectKeys(O, enumBugKeys);
+};
+
+
+/***/ }),
+
 /***/ "./node_modules/core-js/internals/object-property-is-enumerable.js":
 /*!*************************************************************************!*\
   !*** ./node_modules/core-js/internals/object-property-is-enumerable.js ***!
@@ -3336,6 +3346,31 @@ $({ target: 'Number', proto: true, forced: FORCED }, {
     } else {
       result = sign + result;
     } return result;
+  }
+});
+
+
+/***/ }),
+
+/***/ "./node_modules/core-js/modules/es.object.keys.js":
+/*!********************************************************!*\
+  !*** ./node_modules/core-js/modules/es.object.keys.js ***!
+  \********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var $ = __webpack_require__(/*! ../internals/export */ "./node_modules/core-js/internals/export.js");
+var toObject = __webpack_require__(/*! ../internals/to-object */ "./node_modules/core-js/internals/to-object.js");
+var nativeKeys = __webpack_require__(/*! ../internals/object-keys */ "./node_modules/core-js/internals/object-keys.js");
+var fails = __webpack_require__(/*! ../internals/fails */ "./node_modules/core-js/internals/fails.js");
+
+var FAILS_ON_PRIMITIVES = fails(function () { nativeKeys(1); });
+
+// `Object.keys` method
+// https://tc39.github.io/ecma262/#sec-object.keys
+$({ target: 'Object', stat: true, forced: FAILS_ON_PRIMITIVES }, {
+  keys: function keys(it) {
+    return nativeKeys(toObject(it));
   }
 });
 
