@@ -366,10 +366,6 @@ var burger = function burger() {
     e.preventDefault();
     menu.classList.toggle('header-menu-active');
   });
-  close.addEventListener('click', function (e) {
-    e.preventDefault();
-    menu.classList.remove('header-menu-active');
-  });
 };
 
 burger();
